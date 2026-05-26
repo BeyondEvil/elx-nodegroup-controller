@@ -138,14 +138,14 @@ func reconcileNodeTaints(node *corev1.Node, taints []corev1.Taint) bool {
 }
 
 func (r *NodeGroupReconciler) findNodeGroupsForMember(ctx context.Context, node client.Object) []reconcile.Request {
-	log := log.FromContext(context.Background())
+	log := log.FromContext(ctx)
 
 	// NodeGroups with the node listed explicitly in spec.members
 	byMember := &k8sv1alpha2.NodeGroupList{}
 	listOpts := &client.ListOptions{
 		FieldSelector: fields.OneTermEqualSelector(membersField, node.GetName()),
 	}
-	if err := r.List(context.Background(), byMember, listOpts); err != nil {
+	if err := r.List(ctx, byMember, listOpts); err != nil {
 		return []reconcile.Request{}
 	}
 
@@ -160,7 +160,7 @@ func (r *NodeGroupReconciler) findNodeGroupsForMember(ctx context.Context, node 
 
 	// NodeGroups that match the node via nodeGroupNames segment matching
 	allNodeGroups := &k8sv1alpha2.NodeGroupList{}
-	if err := r.List(context.Background(), allNodeGroups); err != nil {
+	if err := r.List(ctx, allNodeGroups); err != nil {
 		return requests
 	}
 	nodeNameParts := strings.Split(node.GetName(), "-")
